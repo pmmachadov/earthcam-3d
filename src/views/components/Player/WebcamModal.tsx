@@ -28,7 +28,24 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${webcam.youtubeId}?autoplay=1&mute=1&playsinline=1&rel=0`;
+  // Listen for YouTube postMessage error events
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      try {
+        const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+        if (data && (data.event === 'onError' || (data.info && typeof data.info === 'number' && [2, 5, 100, 101, 150].includes(data.info)))) {
+          setHasError(true);
+        }
+      } catch {
+        // Not a JSON message, ignore
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const embedUrl = `https://www.youtube.com/embed/${webcam.youtubeId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1${origin ? `&origin=${encodeURIComponent(origin)}` : ''}`;
   const officialWatchUrl = `https://www.youtube.com/watch?v=${webcam.youtubeId}`;
 
   return (
