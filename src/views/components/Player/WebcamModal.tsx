@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { Webcam } from '../../../models/webcam.types';
 import { X, Heart, MapPin, Eye, Radio } from 'lucide-react';
+import Hls from 'hls.js';
 
 interface WebcamModalProps {
   webcam: Webcam;
@@ -15,6 +16,8 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
   onToggleFavorite,
   onClose,
 }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   // Close modal when pressing Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -25,6 +28,42 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
+
+  // Load and play HLS (.m3u8) live stream
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    let hls: Hls | null = null;
+
+    if (Hls.isSupported()) {
+      hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: true,
+      });
+      hls.loadSource(webcam.playerUrl);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().catch(() => {
+          // Handled browser autoplay policy with muted
+          video.muted = true;
+          video.play().catch(() => {});
+        });
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Native Safari iOS/macOS HLS support
+      video.src = webcam.playerUrl;
+      video.addEventListener('loadedmetadata', () => {
+        video.play().catch(() => {});
+      });
+    }
+
+    return () => {
+      if (hls) {
+        hls.destroy();
+      }
+    };
+  }, [webcam.playerUrl]);
 
   return (
     <div
@@ -117,7 +156,7 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
               >
                 <MapPin size={13} style={{ color: '#38bdf8' }} />
                 <span>
-                  {webcam.city}, {webcam.country}
+                  {webcam.city}, {webcam.state}, USA
                 </span>
               </div>
             </div>
@@ -167,7 +206,7 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
           </div>
         </div>
 
-        {/* Video Player Frame */}
+        {/* Video Player Frame with HLS support */}
         <div
           style={{
             position: 'relative',
@@ -176,18 +215,19 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
             backgroundColor: '#020617',
           }}
         >
-          <iframe
-            src={webcam.playerUrl}
-            title={webcam.title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            playsInline
+            controls
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
               width: '100%',
               height: '100%',
-              border: 'none',
+              objectFit: 'cover',
             }}
           />
         </div>
@@ -221,6 +261,7 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
             >
               {webcam.category}
             </span>
+            <span style={{ color: '#22c55e', fontWeight: 600 }}>• US DOT Public Feed</span>
           </div>
 
           {webcam.viewsCount && (

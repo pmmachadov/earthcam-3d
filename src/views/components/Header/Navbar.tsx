@@ -1,6 +1,6 @@
 import React from 'react';
 import type { WebcamCategory } from '../../../models/webcam.types';
-import { Search, Heart, Globe, Radio } from 'lucide-react';
+import { Search, Heart, ShieldAlert, Radio } from 'lucide-react';
 
 interface NavbarProps {
   searchTerm: string;
@@ -14,11 +14,10 @@ interface NavbarProps {
 }
 
 const CATEGORIES: { label: string; value: WebcamCategory | 'all' }[] = [
-  { label: 'All Places', value: 'all' },
-  { label: 'Cities', value: 'city' },
-  { label: 'Landmarks', value: 'landmark' },
-  { label: 'Beaches', value: 'beach' },
-  { label: 'Nature & Space', value: 'nature' },
+  { label: 'All Feeds', value: 'all' },
+  { label: 'Highways & Interstates', value: 'highway' },
+  { label: 'Bridges & Corridors', value: 'bridge' },
+  { label: 'City Traffic', value: 'traffic' },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -71,12 +70,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               color: '#38bdf8',
             }}
           >
-            <Globe size={22} />
+            <ShieldAlert size={22} />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '18px', fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.02em' }}>
-                EarthCam <span style={{ color: '#38bdf8' }}>Live</span>
+                US Watch <span style={{ color: '#38bdf8' }}>Live</span>
               </span>
               <span
                 style={{
@@ -84,20 +83,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                   alignItems: 'center',
                   gap: '4px',
                   padding: '2px 6px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                  backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                  border: '1px solid rgba(34, 197, 94, 0.4)',
                   borderRadius: '9999px',
-                  color: '#ef4444',
+                  color: '#22c55e',
                   fontSize: '9px',
                   fontWeight: 700,
                 }}
               >
                 <Radio size={9} />
-                24/7
+                US DOT 24/7
               </span>
             </div>
             <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>
-              Explore real-time public webcams worldwide
+              Real-time public highway and security cameras across the United States
             </p>
           </div>
         </div>
@@ -123,7 +122,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           />
           <input
             type="text"
-            placeholder="Search city, country or landmark (e.g. Tokyo, Times Square)..."
+            placeholder="Search US cities, highways or bridges (e.g. Los Angeles, San Francisco, I-5)..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             style={{
@@ -212,7 +211,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         })}
 
         <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#64748b', whiteSpace: 'nowrap' }}>
-          Showing <b>{totalCount}</b> feeds
+          Active US Feeds: <b>{totalCount}</b>
         </span>
       </div>
     </header>
