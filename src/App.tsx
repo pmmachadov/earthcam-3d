@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
 import { EarthGlobe } from './views/components/Globe/EarthGlobe';
+import { WebcamModal } from './views/components/Player/WebcamModal';
 import { INITIAL_WEBCAMS } from './models/mockWebcams';
 import type { Webcam } from './models/webcam.types';
 
 export const App: React.FC = () => {
   const [selectedWebcam, setSelectedWebcam] = useState<Webcam | null>(null);
+  const [favorites, setFavorites] = useState<string[]>([]);
 
   const handleWebcamSelect = (webcam: Webcam) => {
     setSelectedWebcam(webcam);
+  };
+
+  const handleToggleFavorite = (webcam: Webcam) => {
+    setFavorites((prev) =>
+      prev.includes(webcam.id) ? prev.filter((id) => id !== webcam.id) : [...prev, webcam.id]
+    );
   };
 
   return (
@@ -54,6 +62,12 @@ export const App: React.FC = () => {
         <span>EARTHCAM 3D</span>
         <span style={{ color: '#64748b' }}>|</span>
         <span style={{ color: '#38bdf8' }}>{INITIAL_WEBCAMS.length} Live Feeds</span>
+        {favorites.length > 0 && (
+          <>
+            <span style={{ color: '#64748b' }}>|</span>
+            <span style={{ color: '#ef4444' }}>❤️ {favorites.length} saved</span>
+          </>
+        )}
       </div>
 
       {/* 3D Globe Viewport */}
@@ -65,48 +79,14 @@ export const App: React.FC = () => {
         />
       </div>
 
-      {/* Temporary Click Feedback Notification */}
+      {/* Live Webcam Modal Video Player */}
       {selectedWebcam && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '24px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 20,
-            background: 'rgba(15, 23, 42, 0.85)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(56, 189, 248, 0.4)',
-            borderRadius: '12px',
-            padding: '12px 24px',
-            color: '#f8fafc',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)',
-          }}
-        >
-          <span style={{ fontSize: '18px' }}>📍</span>
-          <div>
-            <div style={{ fontWeight: 600, fontSize: '14px' }}>{selectedWebcam.title}</div>
-            <div style={{ color: '#94a3b8', fontSize: '12px' }}>
-              {selectedWebcam.city}, {selectedWebcam.country}
-            </div>
-          </div>
-          <button
-            onClick={() => setSelectedWebcam(null)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#94a3b8',
-              cursor: 'pointer',
-              marginLeft: '8px',
-              fontSize: '14px',
-            }}
-          >
-            ✕
-          </button>
-        </div>
+        <WebcamModal
+          webcam={selectedWebcam}
+          isFavorite={favorites.includes(selectedWebcam.id)}
+          onToggleFavorite={handleToggleFavorite}
+          onClose={() => setSelectedWebcam(null)}
+        />
       )}
     </main>
   );
