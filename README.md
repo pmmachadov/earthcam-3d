@@ -1,32 +1,15 @@
-# React + TypeScript + Vite
+# US Live Cams 🇺🇸
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A modern, responsive real-time web application to explore live public coastal, wildlife, and nature webcams across the United States.
 
-Currently, two official plugins are available:
+## Features
+- **Live 24/7 Streams**: Real-time wildlife and coastal feeds from California, Alaska, Iowa, and more.
+- **Real-Time Search & Filters**: Search by location, state, or animal, and filter by categories (Wildlife, Beaches, Marine).
+- **Personal Watchlist**: Save your favorite live feeds locally.
+- **Modern Responsive UI**: Clean dark-mode dashboard built with React 19, TypeScript, and Vite.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Tech Stack
+- **Framework**: React 19 + TypeScript + Vite
+- **Icons**: Lucide React
+- **Package Manager**: pnpm
+- **Deployment**: Vercel ready
