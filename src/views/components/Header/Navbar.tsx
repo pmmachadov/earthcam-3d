@@ -18,6 +18,8 @@ const CATEGORIES: { label: string; value: WebcamCategory | 'all' }[] = [
   { label: 'Wildlife & Sanctuaries', value: 'wildlife' },
   { label: 'Beaches & Coasts', value: 'beach' },
   { label: 'Marine & Oceans', value: 'ocean' },
+  { label: 'Parks & Nature', value: 'nature' },
+  { label: 'City Skylines', value: 'city' },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({

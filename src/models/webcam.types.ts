@@ -1,15 +1,21 @@
 export type USState =
-  | 'California'
   | 'Alaska'
-  | 'Iowa'
+  | 'California'
+  | 'District of Columbia'
   | 'Florida'
-  | 'Hawaii';
+  | 'Iowa'
+  | 'Louisiana'
+  | 'Minnesota'
+  | 'New Jersey'
+  | 'New York'
+  | 'Tennessee';
 
 export type WebcamCategory =
   | 'wildlife'
   | 'beach'
   | 'ocean'
-  | 'nature';
+  | 'nature'
+  | 'city';
 
 export interface Webcam {
   id: string;
@@ -22,6 +28,8 @@ export interface Webcam {
   thumbnailUrl: string;
   youtubeId: string;
   description: string;
+  /** Organization that operates the live stream (e.g. explore.org, EarthCam). */
+  source: string;
   status: 'active' | 'offline';
   viewsCount?: number;
 }

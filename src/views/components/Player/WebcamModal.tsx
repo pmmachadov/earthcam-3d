@@ -303,7 +303,7 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
               >
                 {webcam.category}
               </span>
-              <span style={{ color: '#22c55e', fontWeight: 600 }}>• Explore.org USA Partner</span>
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>• Live by {webcam.source}</span>
             </div>
 
             {webcam.viewsCount && (
