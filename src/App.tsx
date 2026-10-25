@@ -1,85 +1,141 @@
-import React, { useState } from 'react';
-import { EarthGlobe } from './views/components/Globe/EarthGlobe';
+import React, { useState, useMemo } from 'react';
+import { Navbar } from './views/components/Header/Navbar';
+import { WebcamCard } from './views/components/Card/WebcamCard';
 import { WebcamModal } from './views/components/Player/WebcamModal';
 import { INITIAL_WEBCAMS } from './models/mockWebcams';
-import type { Webcam } from './models/webcam.types';
+import type { Webcam, WebcamCategory } from './models/webcam.types';
+import { Camera, Heart } from 'lucide-react';
 
 export const App: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<WebcamCategory | 'all'>('all');
+  const [onlyFavorites, setOnlyFavorites] = useState(false);
   const [selectedWebcam, setSelectedWebcam] = useState<Webcam | null>(null);
-  const [favorites, setFavorites] = useState<string[]>([]);
-
-  const handleWebcamSelect = (webcam: Webcam) => {
-    setSelectedWebcam(webcam);
-  };
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('earthcam_favorites');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const handleToggleFavorite = (webcam: Webcam) => {
-    setFavorites((prev) =>
-      prev.includes(webcam.id) ? prev.filter((id) => id !== webcam.id) : [...prev, webcam.id]
-    );
+    setFavorites((prev) => {
+      const updated = prev.includes(webcam.id)
+        ? prev.filter((id) => id !== webcam.id)
+        : [...prev, webcam.id];
+      try {
+        localStorage.setItem('earthcam_favorites', JSON.stringify(updated));
+      } catch {
+        // LocalStorage fallback
+      }
+      return updated;
+    });
   };
 
+  // Filter webcams by search term, category and favorites
+  const filteredWebcams = useMemo(() => {
+    return INITIAL_WEBCAMS.filter((cam) => {
+      // 1. Search term (matches city, country, or title)
+      const term = searchTerm.toLowerCase().trim();
+      const matchesSearch =
+        term === '' ||
+        cam.title.toLowerCase().includes(term) ||
+        cam.city.toLowerCase().includes(term) ||
+        cam.country.toLowerCase().includes(term);
+
+      // 2. Category
+      const matchesCategory = selectedCategory === 'all' || cam.category === selectedCategory;
+
+      // 3. Favorites only
+      const matchesFavorites = !onlyFavorites || favorites.includes(cam.id);
+
+      return matchesSearch && matchesCategory && matchesFavorites;
+    });
+  }, [searchTerm, selectedCategory, onlyFavorites, favorites]);
+
   return (
-    <main
+    <div
       style={{
-        width: '100vw',
-        height: '100vh',
+        minHeight: '100vh',
         backgroundColor: '#030712',
-        position: 'relative',
+        color: '#f8fafc',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      {/* Top Quick Status Pill */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '20px',
-          left: '24px',
-          zIndex: 10,
-          background: 'rgba(15, 23, 42, 0.75)',
-          backdropFilter: 'blur(8px)',
-          border: '1px solid rgba(56, 189, 248, 0.2)',
-          borderRadius: '9999px',
-          padding: '8px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          color: '#e2e8f0',
-          fontSize: '13px',
-          fontWeight: 500,
-          letterSpacing: '0.02em',
+      {/* Sticky Header with Search & Filters */}
+      <Navbar
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        selectedCategory={selectedCategory}
+        onCategorySelect={(cat) => {
+          setSelectedCategory(cat);
+          setOnlyFavorites(false);
         }}
-      >
-        <span
-          style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            backgroundColor: '#22c55e',
-            boxShadow: '0 0 8px #22c55e',
-          }}
-        />
-        <span>EARTHCAM 3D</span>
-        <span style={{ color: '#64748b' }}>|</span>
-        <span style={{ color: '#38bdf8' }}>{INITIAL_WEBCAMS.length} Live Feeds</span>
-        {favorites.length > 0 && (
-          <>
-            <span style={{ color: '#64748b' }}>|</span>
-            <span style={{ color: '#ef4444' }}>❤️ {favorites.length} saved</span>
-          </>
+        onlyFavorites={onlyFavorites}
+        onToggleOnlyFavorites={() => setOnlyFavorites((prev) => !prev)}
+        favoritesCount={favorites.length}
+        totalCount={filteredWebcams.length}
+      />
+
+      {/* Main Content Grid */}
+      <main style={{ flex: 1, padding: '24px', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
+        {filteredWebcams.length === 0 ? (
+          /* Empty Search State */
+          <div
+            style={{
+              padding: '60px 20px',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '12px',
+              color: '#64748b',
+            }}
+          >
+            {onlyFavorites ? (
+              <>
+                <Heart size={44} style={{ color: '#ef4444', opacity: 0.5 }} />
+                <h3 style={{ fontSize: '18px', color: '#cbd5e1', margin: 0 }}>No favorite cameras yet</h3>
+                <p style={{ fontSize: '14px', maxWidth: '360px', margin: 0 }}>
+                  Click the heart icon on any camera feed to save it to your personal watchlist.
+                </p>
+              </>
+            ) : (
+              <>
+                <Camera size={44} style={{ opacity: 0.5 }} />
+                <h3 style={{ fontSize: '18px', color: '#cbd5e1', margin: 0 }}>No webcams found</h3>
+                <p style={{ fontSize: '14px', maxWidth: '360px', margin: 0 }}>
+                  Try adjusting your search terms or clearing the selected category filter.
+                </p>
+              </>
+            )}
+          </div>
+        ) : (
+          /* Responsive Cards Grid */
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: '20px',
+            }}
+          >
+            {filteredWebcams.map((webcam) => (
+              <WebcamCard
+                key={webcam.id}
+                webcam={webcam}
+                isFavorite={favorites.includes(webcam.id)}
+                onToggleFavorite={handleToggleFavorite}
+                onSelect={(cam) => setSelectedWebcam(cam)}
+              />
+            ))}
+          </div>
         )}
-      </div>
+      </main>
 
-      {/* 3D Globe Viewport */}
-      <div style={{ flex: 1, width: '100%', height: '100%', position: 'relative' }}>
-        <EarthGlobe
-          webcams={INITIAL_WEBCAMS}
-          selectedWebcamId={selectedWebcam?.id}
-          onWebcamSelect={handleWebcamSelect}
-        />
-      </div>
-
-      {/* Live Webcam Modal Video Player */}
+      {/* Live Stream Player Modal */}
       {selectedWebcam && (
         <WebcamModal
           webcam={selectedWebcam}
@@ -88,7 +144,7 @@ export const App: React.FC = () => {
           onClose={() => setSelectedWebcam(null)}
         />
       )}
-    </main>
+    </div>
   );
 };
 

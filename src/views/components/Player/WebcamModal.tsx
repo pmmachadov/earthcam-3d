@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import type { Webcam } from '../../../models/webcam.types';
-import { X, Heart, MapPin, Eye, Radio, ExternalLink } from 'lucide-react';
+import { X, Heart, MapPin, Eye, Radio } from 'lucide-react';
 
 interface WebcamModalProps {
   webcam: Webcam;
