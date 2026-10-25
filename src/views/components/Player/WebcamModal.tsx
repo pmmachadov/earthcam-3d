@@ -1,7 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Webcam } from '../../../models/webcam.types';
-import { X, Heart, MapPin, Eye, Radio } from 'lucide-react';
-import Hls from 'hls.js';
+import { X, Heart, MapPin, Eye, Radio, ExternalLink } from 'lucide-react';
 
 interface WebcamModalProps {
   webcam: Webcam;
@@ -16,7 +15,7 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
   onToggleFavorite,
   onClose,
 }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [hasError, setHasError] = useState(false);
 
   // Close modal when pressing Escape key
   useEffect(() => {
@@ -29,41 +28,8 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  // Load and play HLS (.m3u8) live stream
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    let hls: Hls | null = null;
-
-    if (Hls.isSupported()) {
-      hls = new Hls({
-        enableWorker: true,
-        lowLatencyMode: true,
-      });
-      hls.loadSource(webcam.playerUrl);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play().catch(() => {
-          // Handled browser autoplay policy with muted
-          video.muted = true;
-          video.play().catch(() => {});
-        });
-      });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      // Native Safari iOS/macOS HLS support
-      video.src = webcam.playerUrl;
-      video.addEventListener('loadedmetadata', () => {
-        video.play().catch(() => {});
-      });
-    }
-
-    return () => {
-      if (hls) {
-        hls.destroy();
-      }
-    };
-  }, [webcam.playerUrl]);
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${webcam.youtubeId}?autoplay=1&mute=1&playsinline=1&rel=0`;
+  const officialWatchUrl = `https://www.youtube.com/watch?v=${webcam.youtubeId}`;
 
   return (
     <div
@@ -73,8 +39,8 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 50,
-        backgroundColor: 'rgba(3, 7, 18, 0.75)',
-        backdropFilter: 'blur(8px)',
+        backgroundColor: 'rgba(3, 7, 18, 0.8)',
+        backdropFilter: 'blur(10px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -86,7 +52,7 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
       <div
         style={{
           width: '100%',
-          maxWidth: '860px',
+          maxWidth: '880px',
           backgroundColor: '#0f172a',
           border: '1px solid rgba(56, 189, 248, 0.3)',
           borderRadius: '16px',
@@ -127,7 +93,7 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
               }}
             >
               <Radio size={12} style={{ animation: 'pulse 1.5s infinite' }} />
-              LIVE
+              24/7 LIVE
             </div>
 
             <div style={{ minWidth: 0 }}>
@@ -156,7 +122,7 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
               >
                 <MapPin size={13} style={{ color: '#38bdf8' }} />
                 <span>
-                  {webcam.city}, {webcam.state}, USA
+                  {webcam.location}, {webcam.state}, USA
                 </span>
               </div>
             </div>
@@ -164,6 +130,31 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
 
           {/* Action buttons */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            {/* Open stream in YouTube official link */}
+            <a
+              href={officialWatchUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Open full stream in YouTube"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 12px',
+                backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                borderRadius: '8px',
+                color: '#38bdf8',
+                fontSize: '12px',
+                fontWeight: 600,
+                textDecoration: 'none',
+                transition: 'all 0.2s',
+              }}
+            >
+              <span>Watch on YouTube</span>
+              <ExternalLink size={14} />
+            </a>
+
             {/* Favorite button */}
             <button
               onClick={() => onToggleFavorite(webcam)}
@@ -206,7 +197,7 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
           </div>
         </div>
 
-        {/* Video Player Frame with HLS support */}
+        {/* Video Player Frame with fallback banner */}
         <div
           style={{
             position: 'relative',
@@ -215,61 +206,113 @@ export const WebcamModal: React.FC<WebcamModalProps> = ({
             backgroundColor: '#020617',
           }}
         >
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            playsInline
-            controls
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
-          />
+          {hasError ? (
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '14px',
+                padding: '24px',
+                textAlign: 'center',
+                color: '#94a3b8',
+              }}
+            >
+              <p style={{ margin: 0, fontSize: '15px', color: '#f8fafc' }}>
+                This live broadcast requires viewing directly on YouTube due to regional content policy.
+              </p>
+              <a
+                href={officialWatchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 18px',
+                  backgroundColor: '#ef4444',
+                  borderRadius: '8px',
+                  color: '#ffffff',
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  textDecoration: 'none',
+                }}
+              >
+                <span>Open Live Feed on YouTube</span>
+                <ExternalLink size={16} />
+              </a>
+            </div>
+          ) : (
+            <iframe
+              src={embedUrl}
+              title={webcam.title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+              onError={() => setHasError(true)}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                border: 'none',
+              }}
+            />
+          )}
         </div>
 
         {/* Modal Footer / Telemetry Bar */}
         <div
           style={{
-            padding: '12px 20px',
+            padding: '14px 20px',
             backgroundColor: '#090d16',
             borderTop: '1px solid rgba(51, 65, 85, 0.5)',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            fontSize: '12px',
-            color: '#64748b',
+            flexDirection: 'column',
+            gap: '8px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <span>
-              Coordinates: {webcam.latitude.toFixed(4)}°, {webcam.longitude.toFixed(4)}°
-            </span>
-            <span
-              style={{
-                textTransform: 'capitalize',
-                padding: '2px 8px',
-                borderRadius: '4px',
-                backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                color: '#38bdf8',
-                fontWeight: 500,
-              }}
-            >
-              {webcam.category}
-            </span>
-            <span style={{ color: '#22c55e', fontWeight: 600 }}>• US DOT Public Feed</span>
-          </div>
+          <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8', lineHeight: 1.5 }}>
+            {webcam.description}
+          </p>
 
-          {webcam.viewsCount && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Eye size={14} />
-              <span>{webcam.viewsCount.toLocaleString()} views</span>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '12px',
+              color: '#64748b',
+              marginTop: '4px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span
+                style={{
+                  textTransform: 'capitalize',
+                  padding: '2px 8px',
+                  borderRadius: '4px',
+                  backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                  color: '#38bdf8',
+                  fontWeight: 600,
+                }}
+              >
+                {webcam.category}
+              </span>
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>• Explore.org USA Partner</span>
             </div>
-          )}
+
+            {webcam.viewsCount && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Eye size={14} />
+                <span>{webcam.viewsCount.toLocaleString()} watching</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

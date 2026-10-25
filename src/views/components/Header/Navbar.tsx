@@ -1,6 +1,6 @@
 import React from 'react';
 import type { WebcamCategory } from '../../../models/webcam.types';
-import { Search, Heart, ShieldAlert, Radio } from 'lucide-react';
+import { Search, Heart, Trees, Radio } from 'lucide-react';
 
 interface NavbarProps {
   searchTerm: string;
@@ -14,10 +14,10 @@ interface NavbarProps {
 }
 
 const CATEGORIES: { label: string; value: WebcamCategory | 'all' }[] = [
-  { label: 'All Feeds', value: 'all' },
-  { label: 'Highways & Interstates', value: 'highway' },
-  { label: 'Bridges & Corridors', value: 'bridge' },
-  { label: 'City Traffic', value: 'traffic' },
+  { label: 'All Cameras', value: 'all' },
+  { label: 'Wildlife & Sanctuaries', value: 'wildlife' },
+  { label: 'Beaches & Coasts', value: 'beach' },
+  { label: 'Marine & Oceans', value: 'ocean' },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -70,12 +70,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               color: '#38bdf8',
             }}
           >
-            <ShieldAlert size={22} />
+            <Trees size={22} />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '18px', fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.02em' }}>
-                US Watch <span style={{ color: '#38bdf8' }}>Live</span>
+                US Wildlife & Coastal <span style={{ color: '#38bdf8' }}>Live</span>
               </span>
               <span
                 style={{
@@ -92,11 +92,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }}
               >
                 <Radio size={9} />
-                US DOT 24/7
+                24/7 LIVE
               </span>
             </div>
             <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>
-              Real-time public highway and security cameras across the United States
+              Real-time nature, beach and wildlife cameras across the United States
             </p>
           </div>
         </div>
@@ -122,7 +122,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           />
           <input
             type="text"
-            placeholder="Search US cities, highways or bridges (e.g. Los Angeles, San Francisco, I-5)..."
+            placeholder="Search US locations, bears, otters, eagles, beaches..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             style={{
@@ -211,7 +211,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         })}
 
         <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#64748b', whiteSpace: 'nowrap' }}>
-          Active US Feeds: <b>{totalCount}</b>
+          Active Cams: <b>{totalCount}</b>
         </span>
       </div>
     </header>

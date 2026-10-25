@@ -32,7 +32,8 @@ export const WebcamCard: React.FC<WebcamCardProps> = ({
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-4px)';
         e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)';
-        e.currentTarget.style.boxShadow = '0 12px 24px -8px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.1)';
+        e.currentTarget.style.boxShadow =
+          '0 12px 24px -8px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.1)';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
@@ -69,7 +70,8 @@ export const WebcamCard: React.FC<WebcamCardProps> = ({
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, transparent 50%, rgba(15, 23, 42, 0.4) 100%)',
+            background:
+              'linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, transparent 50%, rgba(15, 23, 42, 0.4) 100%)',
           }}
         />
 
@@ -93,7 +95,7 @@ export const WebcamCard: React.FC<WebcamCardProps> = ({
           }}
         >
           <Radio size={11} />
-          LIVE
+          24/7 LIVE
         </div>
 
         {/* Favorite Heart Button */}
@@ -209,7 +211,7 @@ export const WebcamCard: React.FC<WebcamCardProps> = ({
         >
           <MapPin size={13} style={{ color: '#38bdf8', flexShrink: 0 }} />
           <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {webcam.city}, {webcam.country}
+            {webcam.location}, {webcam.state}, USA
           </span>
         </div>
       </div>

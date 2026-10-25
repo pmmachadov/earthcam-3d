@@ -4,7 +4,7 @@ import { WebcamCard } from './views/components/Card/WebcamCard';
 import { WebcamModal } from './views/components/Player/WebcamModal';
 import { INITIAL_WEBCAMS } from './models/mockWebcams';
 import type { Webcam, WebcamCategory } from './models/webcam.types';
-import { Camera, Heart } from 'lucide-react';
+import { Trees, Heart } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,18 +37,14 @@ export const App: React.FC = () => {
   // Filter webcams by search term, category and favorites
   const filteredWebcams = useMemo(() => {
     return INITIAL_WEBCAMS.filter((cam) => {
-      // 1. Search term (matches city, country, or title)
       const term = searchTerm.toLowerCase().trim();
       const matchesSearch =
         term === '' ||
         cam.title.toLowerCase().includes(term) ||
-        cam.city.toLowerCase().includes(term) ||
-        cam.country.toLowerCase().includes(term);
+        cam.location.toLowerCase().includes(term) ||
+        cam.state.toLowerCase().includes(term);
 
-      // 2. Category
       const matchesCategory = selectedCategory === 'all' || cam.category === selectedCategory;
-
-      // 3. Favorites only
       const matchesFavorites = !onlyFavorites || favorites.includes(cam.id);
 
       return matchesSearch && matchesCategory && matchesFavorites;
@@ -105,8 +101,8 @@ export const App: React.FC = () => {
               </>
             ) : (
               <>
-                <Camera size={44} style={{ opacity: 0.5 }} />
-                <h3 style={{ fontSize: '18px', color: '#cbd5e1', margin: 0 }}>No webcams found</h3>
+                <Trees size={44} style={{ opacity: 0.5 }} />
+                <h3 style={{ fontSize: '18px', color: '#cbd5e1', margin: 0 }}>No cameras found</h3>
                 <p style={{ fontSize: '14px', maxWidth: '360px', margin: 0 }}>
                   Try adjusting your search terms or clearing the selected category filter.
                 </p>
@@ -118,7 +114,7 @@ export const App: React.FC = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
               gap: '20px',
             }}
           >

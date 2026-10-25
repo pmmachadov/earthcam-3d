@@ -1,37 +1,27 @@
 export type USState =
   | 'California'
-  | 'New York'
+  | 'Alaska'
+  | 'Iowa'
   | 'Florida'
-  | 'Texas'
-  | 'Washington'
-  | 'Nevada';
+  | 'Hawaii';
 
 export type WebcamCategory =
-  | 'traffic'
-  | 'city'
-  | 'highway'
-  | 'bridge'
-  | 'beach';
+  | 'wildlife'
+  | 'beach'
+  | 'ocean'
+  | 'nature';
 
 export interface Webcam {
   id: string;
   title: string;
-  city: string;
-  state: string;
+  location: string;
+  state: USState;
   country: string;
   countryCode: string;
-  latitude: number;
-  longitude: number;
   category: WebcamCategory;
   thumbnailUrl: string;
-  playerUrl: string; // Direct HLS (.m3u8) live stream
+  youtubeId: string;
+  description: string;
   status: 'active' | 'offline';
   viewsCount?: number;
-}
-
-export interface WebcamFilter {
-  searchTerm: string;
-  state: USState | 'all';
-  category: WebcamCategory | 'all';
-  onlyFavorites: boolean;
 }
