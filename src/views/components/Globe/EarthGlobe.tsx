@@ -145,7 +145,7 @@ export const EarthGlobe: React.FC<EarthGlobeProps> = ({
     let isDragging = false;
     let dragDistance = 0;
     let previousMousePosition = { x: 0, y: 0 };
-    let rotationVelocity = { x: 0, y: 0.002 };
+    let rotationVelocity = { x: 0, y: 0 }; // Only moves when dragged by user
 
     const onMouseDown = (event: MouseEvent) => {
       isDragging = true;
@@ -233,14 +233,15 @@ export const EarthGlobe: React.FC<EarthGlobeProps> = ({
         }
       });
 
-      // Apply friction and auto-spin when idle
+      // Apply smooth deceleration only after user drags
       if (!isDragging) {
-        rotationVelocity.x *= 0.95;
-        if (Math.abs(rotationVelocity.y) < 0.0015) {
-          rotationVelocity.y = 0.0015;
-        } else {
-          rotationVelocity.y *= 0.98;
-        }
+        rotationVelocity.x *= 0.92;
+        rotationVelocity.y *= 0.92;
+
+        // Stop completely when velocity is minimal
+        if (Math.abs(rotationVelocity.x) < 0.0001) rotationVelocity.x = 0;
+        if (Math.abs(rotationVelocity.y) < 0.0001) rotationVelocity.y = 0;
+
         globeGroup.rotation.y += rotationVelocity.y;
         globeGroup.rotation.x += rotationVelocity.x;
       }
